@@ -30,7 +30,7 @@ export default function AddListingPage() {
   // Géocodage automatique de l'adresse (remplace la saisie manuelle de lat/lng)
   const [address, setAddress] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const [city, setCity] = useState(LYON_METRO_CITIES[0]);
+  const [city, setCity] = useState<string>(LYON_METRO_CITIES[0]);
   const [geocoding, setGeocoding] = useState(false);
   const [geocodeResult, setGeocodeResult] = useState<{
     latitude: number;
