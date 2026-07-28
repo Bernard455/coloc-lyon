@@ -117,7 +117,11 @@ async function main() {
             fourthRoomStatus: item.numberOfRooms >= 4 ? "COMPATIBLE" : "UNKNOWN"
           },
           update: {
+            title: item.title,
+            description: item.description,
             totalRent: Math.round(item.totalRentEuros * 100),
+            mainPhotoUrl: item.photos[0],
+            photos: { deleteMany: {}, create: item.photos.map((url, position) => ({ url, position })) },
             qualityScore: scoreBreakdown.total,
             scoreBreakdown: scoreBreakdown as any,
             isSuspicious: suspicion.isSuspicious,
