@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "postinstall": "prisma generate",
     "test": "vitest run",
     "test:watch": "vitest",
     "db:generate": "prisma generate",
