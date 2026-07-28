@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { startOfDay } from "date-fns";
 
+export const dynamic = "force-dynamic";
+
 async function getStats() {
   const [total, wholeHomes, sharedRoommate, priceAgg, surfaceAgg, todayCount] = await Promise.all([
     prisma.listing.count({ where: { status: "ACTIVE" } }),
