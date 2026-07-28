@@ -1,0 +1,246 @@
+// Schéma de base de données — Coloc Lyon
+// PostgreSQL + Prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  EXISTING_ROOMMATE_SHARE // colocation déjà constituée, cherche un 4e
+  SINGLE_ROOM
+}
+
+enum ListingStatus {
+  ACTIVE
+  EXPIRED
+  RENTED
+  SUSPICIOUS // détecté par l'IA comme potentiellement frauduleux
+  PENDING_REVIEW
+}
+
+enum FourthRoomStatus {
+  UNKNOWN          // ❓ à vérifier auprès du propriétaire
+  COMPATIBLE       // ✅ compatible 4 colocataires (salon convertible / bail l'autorise)
+  NOT_COMPATIBLE
+}
+
+enum SourcePlatform {
+  LEBONCOIN
+  SELOGER
+  BIENICI
+  PAP
+  STUDAPART
+  CARTE_DES_COLOCS
+  LOCSERVICE
+  JINKA
+  LOGIC_IMMO
+  AGENCY
+  STUDENT_RESIDENCE
+  OTHER
+}
+
+model Listing {
+  id                String            @id @default(cuid())
+  title             String
+  description       String            @db.Text
+  propertyType      PropertyType
+  status            ListingStatus     @default(ACTIVE)
+
+  // Prix
+  totalRent         Int               // en centimes d'euro, prix total mensuel
+  chargesIncluded   Boolean           @default(false)
+  chargesAmount     Int?              // en centimes, si non compris
+  deposit           Int?              // dépôt de garantie, en centimes
+
+  // Caractéristiques
+  surfaceM2          Float?
+  numberOfRooms      Int               // nombre de chambres
+  numberOfBathrooms  Int?
+  floor              String?
+  furnished          Boolean?
+  dpeRating          String?           // A-G
+
+  // 4e colocataire (pertinent surtout pour les T3)
+  fourthRoomStatus   FourthRoomStatus  @default(UNKNOWN)
+  fourthRoomNote     String?           @db.Text
+
+  // Localisation
+  address            String
+  postalCode         String
+  city               String
+  neighborhood        String?
+  latitude           Float
+  longitude          Float
+  distanceMetroM     Int?
+  distanceTramM      Int?
+  distanceShopsM     Int?
+  distanceSchoolsM   Int?
+  centerCommuteMin   Int?
+
+  // Médias
+  photos             Photo[]
+  mainPhotoUrl       String?
+
+  // Contact
+  contactName        String?
+  contactPhone       String?
+  contactEmail       String?
+  contactWhatsapp    String?
+  contactFormUrl     String?
+  agencyName         String?
+  openingHours       String?
+
+  // Source & provenance
+  source             SourcePlatform
+  sourceUrl          String
+  sourceListingId    String            // id natif chez la source, sert à la dédup
+  externalPublishedAt DateTime?
+
+  // IA / scoring
+  qualityScore       Int?              // 0-100
+  scoreBreakdown      Json?            // détail des critères qui composent le score
+  isSuspicious       Boolean           @default(false)
+  suspiciousReasons  String[]
+
+  // Dédoublonnage : cluster d'annonces identiques venant de plusieurs sources
+  dedupeClusterId    String?
+  dedupeCluster      DedupeCluster?    @relation(fields: [dedupeClusterId], references: [id])
+
+  favorites          Favorite[]
+  comparisonItems    ComparisonItem[]
+
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@unique([source, sourceListingId])
+  @@index([city])
+  @@index([totalRent])
+  @@index([numberOfRooms])
+  @@index([propertyType])
+  @@index([status])
+  @@index([dedupeClusterId])
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  url       String
+  position  Int      @default(0)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+// Regroupe plusieurs annonces (sources différentes) qui décrivent le même logement réel
+model DedupeCluster {
+  id         String    @id @default(cuid())
+  listings   Listing[]
+  createdAt  DateTime  @default(now())
+}
+
+model User {
+  id            String     @id @default(cuid())
+  name          String?
+  email         String     @unique
+  emailVerified DateTime?
+  image         String?
+  favorites     Favorite[]
+  alerts        Alert[]
+  comparisons   Comparison[]
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime   @default(now())
+}
+
+// Modèles requis par l'adapter Prisma d'Auth.js (@auth/prisma-adapter)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+}
+
+model Comparison {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String           @default("Comparaison sans titre")
+  items     ComparisonItem[]
+  createdAt DateTime         @default(now())
+}
+
+model ComparisonItem {
+  id           String     @id @default(cuid())
+  comparisonId String
+  comparison   Comparison @relation(fields: [comparisonId], references: [id], onDelete: Cascade)
+  listingId    String
+  listing      Listing    @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model Alert {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  // critères stockés en JSON pour rester flexibles (mêmes filtres que la recherche)
+  criteria      Json
+  channels      String[]    // ["email", "browser"]
+  active        Boolean     @default(true)
+  lastTriggeredAt DateTime?
+  createdAt     DateTime    @default(now())
+}
+
+model IngestionLog {
+  id            String         @id @default(cuid())
+  source        SourcePlatform
+  startedAt     DateTime       @default(now())
+  finishedAt    DateTime?
+  listingsFound Int            @default(0)
+  listingsNew   Int            @default(0)
+  errors        String[]
+  status        String         @default("running") // running | success | failed
+}
