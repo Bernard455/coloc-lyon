@@ -4,7 +4,7 @@
  * mise en place avec un vrai provider (Google, email magic link, etc.).
  */
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 
 export async function getCurrentUserId(): Promise<string | null> {
   try {
