@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
 
+// Génère le sitemap dynamiquement à chaque requête plutôt qu'au moment du
+// build, pour la même raison que le dashboard (voir sa page.tsx).
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

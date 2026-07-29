@@ -244,3 +244,14 @@ model IngestionLog {
   errors        String[]
   status        String         @default("running") // running | success | failed
 }
+
+// Configuration de la synchronisation automatique (fréquence, dernier run).
+// Ligne unique (id fixe "default") lue/écrite par la page d'admin et le cron.
+model SyncSettings {
+  id            String    @id @default("default")
+  enabled       Boolean   @default(true)
+  frequency     String    @default("hourly") // "hourly" | "every6h" | "daily"
+  lastRunAt     DateTime?
+  lastRunStatus String?   // "success" | "failed" | "running"
+  updatedAt     DateTime  @updatedAt
+}

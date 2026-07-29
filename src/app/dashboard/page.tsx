@@ -1,6 +1,10 @@
 import { prisma } from "@/lib/db";
 import { startOfDay } from "date-fns";
 
+// Cette page interroge la base à chaque visite plutôt qu'au moment du
+// build — nécessaire car les tables n'existent pas encore lors du tout
+// premier déploiement (avant `prisma migrate deploy`), et de toute façon
+// des statistiques agrégées doivent rester à jour en temps réel.
 export const dynamic = "force-dynamic";
 
 async function getStats() {

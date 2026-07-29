@@ -75,6 +75,7 @@ export default function HomePage() {
             <a href="/alertes" className="btn-secondary">🔔 Alertes</a>
             <a href="/dashboard" className="btn-secondary">📊 Tableau de bord</a>
             <a href="/admin/ajouter-annonce" className="btn-secondary">➕ Ajouter une annonce</a>
+            <a href="/admin/synchronisation" className="btn-secondary">⚙️ Synchronisation</a>
           </nav>
         </div>
         <SearchBar onSearch={handleNaturalSearch} initialValue={filters.query} />

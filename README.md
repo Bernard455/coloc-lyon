@@ -114,6 +114,35 @@ Ajoute une ligne à `data/manual-listings.csv` (même structure que les exemples
 5. Ajouter `npx prisma migrate deploy` comme build command additionnelle, ou l'exécuter manuellement après le premier déploiement
 6. Planifier `npm run ingest` en cron (Vercel Cron Jobs ou GitHub Actions scheduled workflow) toutes les 30 minutes
 
+## Synchronisation automatique
+
+Ajoutée sans toucher à l'existant : le pipeline d'ingestion (`npm run ingest`) a été extrait dans `src/scrapers/runIngestion.ts` pour être réutilisable par trois déclencheurs différents, qui font exactement la même chose :
+
+1. **CLI** — `npm run ingest` (inchangé)
+2. **Bouton admin** — page `/admin/synchronisation`, bouton "Lancer une synchronisation maintenant"
+3. **Cron automatique** — `src/app/api/cron/sync/route.ts`, planifié dans `vercel.json`
+
+Nouveautés du pipeline :
+- Les annonces d'une source qui ne réapparaissent plus dans un run réussi passent automatiquement au statut `EXPIRED` (au lieu de rester actives indéfiniment)
+- La fréquence (toutes les heures / 6h / 1 jour) se configure depuis `/admin/synchronisation` et est stockée en base (`SyncSettings`)
+
+**Limite du plan gratuit Vercel** : les Cron Jobs sur le plan Hobby ne peuvent se déclencher qu'une fois par jour — `vercel.json` est donc réglé sur `"0 4 * * *"` (4h du matin) par défaut. Pour une fréquence plus élevée sans passer sur un plan payant Vercel, utilise un workflow GitHub Actions planifié qui appelle `GET https://ton-site.vercel.app/api/cron/sync` (avec le header `Authorization: Bearer <CRON_SECRET>` si tu as configuré cette variable d'environnement) :
+
+```yaml
+# .github/workflows/sync.yml
+name: Sync listings
+on:
+  schedule:
+    - cron: "0 * * * *" # toutes les heures
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" https://ton-site.vercel.app/api/cron/sync
+```
+
+La route elle-même vérifie la fréquence configurée avant de relancer quoi que ce soit — appeler `/api/cron/sync` plus souvent que nécessaire ne déclenche pas de synchronisations en trop.
+
 ## Ce qui vient d'être ajouté
 
 - **Géocodage automatique** (`src/lib/geocoding.ts`) : convertit une adresse en latitude/longitude via l'API Adresse du gouvernement français (gratuite, sans clé, précise pour la France) avec repli automatique sur Nominatim/OpenStreetMap. Le formulaire admin n'exige plus de saisir les coordonnées à la main — bouton "Localiser l'adresse" avec confirmation visuelle. L'import CSV (`adapters/manual.ts`) géocode aussi automatiquement les lignes sans coordonnées.
