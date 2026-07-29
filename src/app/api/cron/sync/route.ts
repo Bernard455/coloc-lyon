@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { runIngestion } from "@/scrapers/runIngestion";
 import { isSyncDue, minutesUntilDue, type SyncFrequency } from "@/lib/syncSchedule";
+export const dynamic = "force-dynamic";
 
 const SETTINGS_ID = "default";
 
