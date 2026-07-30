@@ -39,8 +39,8 @@ export async function POST(req: NextRequest) {
     if (!membership) return NextResponse.json({ error: "Tu n'es pas membre de ce groupe" }, { status: 403 });
   }
 
-  const existing = await prisma.favorite.findUnique({
-    where: { userId_listingId_groupId: { userId, listingId, groupId: groupId ?? null } }
+  const existing = await prisma.favorite.findFirst({
+    where: { userId, listingId, groupId: groupId ?? null }
   });
   if (existing) {
     await prisma.favorite.delete({ where: { id: existing.id } });
