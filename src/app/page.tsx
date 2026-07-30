@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { SearchBar } from "@/components/SearchBar";
 import { Filters } from "@/components/Filters";
 import { ListingCard } from "@/components/ListingCard";
+import { AuthButton } from "@/components/AuthButton";
 import { parseSearchQuery, mergeIntentIntoFilters } from "@/lib/nlpSearch";
 import { DEFAULT_FILTERS, type ListingDTO, type SearchFilters } from "@/types/listing";
 
@@ -67,18 +68,21 @@ export default function HomePage() {
       <header className="mb-8 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold">Coloc Lyon</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Logements pour un groupe de 4 étudiants — Lyon &amp; métropole</p>
+            <h1 className="text-2xl font-bold">Comparo</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Compare et partage les logements trouvés pour ton groupe</p>
           </div>
-          <nav className="flex flex-wrap gap-3 text-sm font-medium">
-            <a href="/favoris" className="btn-secondary">❤️ Favoris</a>
-            <a href="/groupes" className="btn-secondary">👥 Groupes</a>
-            <a href="/comparateur" className="btn-secondary">⚖️ Comparateur</a>
-            <a href="/alertes" className="btn-secondary">🔔 Alertes</a>
-            <a href="/dashboard" className="btn-secondary">📊 Tableau de bord</a>
-            <a href="/admin/ajouter-annonce" className="btn-secondary">➕ Ajouter une annonce</a>
-            <a href="/admin/synchronisation" className="btn-secondary">⚙️ Synchronisation</a>
-          </nav>
+          <div className="flex flex-wrap items-center gap-3">
+            <nav className="flex flex-wrap gap-3 text-sm font-medium">
+              <a href="/favoris" className="btn-secondary">❤️ Favoris</a>
+              <a href="/groupes" className="btn-secondary">👥 Groupes</a>
+              <a href="/comparateur" className="btn-secondary">⚖️ Comparateur</a>
+              <a href="/alertes" className="btn-secondary">🔔 Alertes</a>
+              <a href="/dashboard" className="btn-secondary">📊 Tableau de bord</a>
+              <a href="/admin/ajouter-annonce" className="btn-secondary">➕ Ajouter une annonce</a>
+              <a href="/admin/synchronisation" className="btn-secondary">⚙️ Synchronisation</a>
+            </nav>
+            <AuthButton />
+          </div>
         </div>
         <SearchBar onSearch={handleNaturalSearch} initialValue={filters.query} />
       </header>

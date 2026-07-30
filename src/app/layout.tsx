@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: {
-    default: "Coloc Lyon — Logements pour groupes d'étudiants",
-    template: "%s | Coloc Lyon"
+    default: "Comparo — Comparateur de logements en colocation",
+    template: "%s | Comparo"
   },
   description:
-    "Trouvez en un seul endroit les colocations, appartements et maisons compatibles avec un groupe de 4 étudiants à Lyon et sa métropole.",
-  metadataBase: new URL("https://coloc-lyon.fr"),
+    "Compare, filtre et partage les logements que tu trouves pour ton groupe — colocations, appartements et maisons, avec score qualité automatique.",
+  metadataBase: new URL("https://coloc-lyon.vercel.app"),
   openGraph: {
-    title: "Coloc Lyon — Logements pour groupes d'étudiants",
-    description: "Colocations, appartements et maisons pour 4 étudiants à Lyon.",
+    title: "Comparo — Comparateur de logements en colocation",
+    description: "Compare et partage les logements trouvés pour ton groupe.",
     locale: "fr_FR",
     type: "website"
   },
@@ -22,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr">
       <body className="min-h-screen bg-gray-50 text-gray-900 antialiased dark:bg-surface-dark dark:text-gray-100">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
