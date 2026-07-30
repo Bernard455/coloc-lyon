@@ -68,7 +68,8 @@ export const manualAdapter: SourceAdapter = {
     const listings: RawListing[] = [];
 
     for (const row of rows) {
-      if (!cities.some((c) => c.toLowerCase() === row.city?.toLowerCase())) continue;
+      // Un tableau vide signifie "toutes villes" — plus de restriction à la région lyonnaise
+      if (cities.length && !cities.some((c) => c.toLowerCase() === row.city?.toLowerCase())) continue;
 
       const propertyType = VALID_PROPERTY_TYPES.includes(row.propertyType as PropertyType)
         ? (row.propertyType as PropertyType)

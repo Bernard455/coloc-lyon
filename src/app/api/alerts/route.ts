@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getCurrentUserId } from "@/lib/auth-helpers";
+
 export const dynamic = "force-dynamic";
 
 const alertSchema = z.object({
@@ -10,7 +11,8 @@ const alertSchema = z.object({
     maxTotalRentEuros: z.number(),
     maxPricePerPersonEuros: z.number(),
     numberOfRooms: z.array(z.number()),
-    cities: z.array(z.string())
+    cities: z.array(z.string()),
+    groupSize: z.number().optional()
   }),
   channels: z.array(z.enum(["email", "browser"])).min(1)
 });

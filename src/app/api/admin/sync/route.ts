@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+
+// GET() ne prend aucun paramètre de requête — sans ceci, Next.js pourrait
+// tenter de le pré-rendre au moment du build (même souci que dashboard/
+// sitemap/cron : la base peut ne pas être migrée à ce moment-là).
 export const dynamic = "force-dynamic";
 
 const SETTINGS_ID = "default";

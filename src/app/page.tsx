@@ -23,6 +23,7 @@ export default function HomePage() {
     setLoading(true);
     const params = new URLSearchParams();
     params.set("cities", filters.cities.join(","));
+    params.set("groupSize", String(filters.groupSize));
     params.set("maxTotalRentEuros", String(filters.maxTotalRentEuros));
     params.set("maxPricePerPersonEuros", String(filters.maxPricePerPersonEuros));
     params.set("numberOfRooms", filters.numberOfRooms.join(","));
@@ -71,6 +72,7 @@ export default function HomePage() {
           </div>
           <nav className="flex flex-wrap gap-3 text-sm font-medium">
             <a href="/favoris" className="btn-secondary">❤️ Favoris</a>
+            <a href="/groupes" className="btn-secondary">👥 Groupes</a>
             <a href="/comparateur" className="btn-secondary">⚖️ Comparateur</a>
             <a href="/alertes" className="btn-secondary">🔔 Alertes</a>
             <a href="/dashboard" className="btn-secondary">📊 Tableau de bord</a>
@@ -111,6 +113,7 @@ export default function HomePage() {
                 <ListingCard
                   key={listing.id}
                   listing={listing}
+                  groupSize={filters.groupSize}
                   onToggleFavorite={toggleFavorite}
                   isFavorite={favorites.has(listing.id)}
                 />

@@ -9,6 +9,7 @@ interface AlertCriteria {
   maxPricePerPersonEuros: number;
   numberOfRooms: number[];
   cities: string[];
+  groupSize?: number; // absent sur les alertes créées avant cette fonctionnalité — repli sur 4
 }
 
 export async function matchNewListingsToAlerts(newListingIds: string[]) {
@@ -21,8 +22,9 @@ export async function matchNewListingsToAlerts(newListingIds: string[]) {
 
   for (const alert of alerts) {
     const criteria = alert.criteria as unknown as AlertCriteria;
+    const groupSize = criteria.groupSize ?? 4;
     const matches = listings.filter((l) => {
-      const pricePerPerson = l.totalRent / 100 / Math.max(l.numberOfRooms, 4);
+      const pricePerPerson = l.totalRent / 100 / Math.max(groupSize, 1);
       return (
         l.totalRent / 100 <= criteria.maxTotalRentEuros &&
         pricePerPerson <= criteria.maxPricePerPersonEuros &&

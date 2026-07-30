@@ -14,7 +14,7 @@
  *  - "appartement entier près de Bellecour"
  */
 
-import { LYON_METRO_CITIES, type PropertyType, type SearchFilters } from "@/types/listing";
+import { LYON_METRO_CITIES, MIN_GROUP_SIZE, MAX_GROUP_SIZE, defaultRoomsForGroupSize, type PropertyType, type SearchFilters } from "@/types/listing";
 
 export interface ParsedIntent {
   propertyTypes?: PropertyType[];
@@ -24,7 +24,8 @@ export interface ParsedIntent {
   nearTram?: boolean;
   neighborhoodHint?: string;
   cityHint?: string;
-  numberOfRoomsHint?: (3 | 4)[];
+  groupSizeHint?: number;
+  numberOfRoomsHint?: number[];
 }
 
 const PROPERTY_TYPE_KEYWORDS: Array<{ regex: RegExp; type: PropertyType }> = [
@@ -78,11 +79,14 @@ export function parseSearchQuery(query: string): ParsedIntent {
   const city = LYON_METRO_CITIES.find((c) => q.toLowerCase().includes(c.toLowerCase()));
   if (city) intent.cityHint = city;
 
-  // Nombre de chambres explicite : "pour 4 étudiants", "4 chambres", "colocation à 4"
-  if (/\b4\b.{0,15}(étudiants?|chambres?|colocataires?|personnes?)/i.test(q) || /colocation à 4/i.test(q)) {
-    intent.numberOfRoomsHint = [4];
-  } else if (/\b3\b.{0,15}(chambres?|colocataires?)/i.test(q)) {
-    intent.numberOfRoomsHint = [3];
+  // Taille de groupe explicite : "pour 5 étudiants", "6 chambres", "colocation à 3"
+  const groupMatch = q.match(/\b([2-8])\b.{0,15}(étudiants?|chambres?|colocataires?|personnes?)/i) || q.match(/colocation à ([2-8])\b/i);
+  if (groupMatch) {
+    const n = parseInt(groupMatch[1], 10);
+    if (n >= MIN_GROUP_SIZE && n <= MAX_GROUP_SIZE) {
+      intent.groupSizeHint = n;
+      intent.numberOfRoomsHint = defaultRoomsForGroupSize(n);
+    }
   }
 
   return intent;
@@ -95,6 +99,7 @@ export function mergeIntentIntoFilters(base: SearchFilters, intent: ParsedIntent
     propertyTypes: intent.propertyTypes ?? base.propertyTypes,
     maxPricePerPersonEuros: intent.maxPricePerPersonEuros ?? base.maxPricePerPersonEuros,
     maxTotalRentEuros: intent.maxTotalRentEuros ?? base.maxTotalRentEuros,
+    groupSize: intent.groupSizeHint ?? base.groupSize,
     numberOfRooms: intent.numberOfRoomsHint ?? base.numberOfRooms,
     cities: intent.cityHint ? [intent.cityHint] : base.cities
   };

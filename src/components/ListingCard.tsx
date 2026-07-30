@@ -10,7 +10,7 @@ const PROPERTY_TYPE_LABELS: Record<ListingDTO["propertyType"], string> = {
   SINGLE_ROOM: "Chambre individuelle"
 };
 
-export function ListingCard({ listing, onToggleFavorite, isFavorite }: { listing: ListingDTO; onToggleFavorite?: (id: string) => void; isFavorite?: boolean }) {
+export function ListingCard({ listing, onToggleFavorite, isFavorite, groupSize = 4 }: { listing: ListingDTO; onToggleFavorite?: (id: string) => void; isFavorite?: boolean; groupSize?: number }) {
   return (
     <div className="card group overflow-hidden">
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
@@ -28,8 +28,8 @@ export function ListingCard({ listing, onToggleFavorite, isFavorite }: { listing
 
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
           <span className="badge bg-white/90 text-gray-800 backdrop-blur">{PROPERTY_TYPE_LABELS[listing.propertyType]}</span>
-          {listing.fourthRoomStatus === "COMPATIBLE" && <span className="badge badge-success">✅ Compatible 4 colocataires</span>}
-          {listing.fourthRoomStatus === "UNKNOWN" && listing.numberOfRooms === 3 && (
+          {listing.fourthRoomStatus === "COMPATIBLE" && <span className="badge badge-success">✅ Compatible {groupSize} colocataires</span>}
+          {listing.fourthRoomStatus === "UNKNOWN" && listing.numberOfRooms === groupSize - 1 && (
             <span className="badge badge-warning">❓ À vérifier auprès du propriétaire</span>
           )}
           {listing.isSuspicious && <span className="badge badge-danger">⚠ Annonce à vérifier</span>}

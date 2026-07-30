@@ -191,7 +191,7 @@ export default function AddListingPage() {
           </label>
 
           <label className="text-sm font-medium">
-            Compatibilité 4 colocataires (si 3 chambres)
+            Compatibilité avec un colocataire supplémentaire
             <select name="fourthRoomStatus" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 dark:border-gray-700 dark:bg-gray-900">
               <option value="UNKNOWN">❓ À vérifier</option>
               <option value="COMPATIBLE">✅ Compatible</option>
@@ -231,14 +231,17 @@ export default function AddListingPage() {
 
             <label className="mt-3 block text-sm font-medium">
               Ville *
-              <select
+              <input
+                list="city-suggestions"
                 value={city}
                 onChange={(e) => { setCity(e.target.value); setGeocodeResult(null); }}
                 required
+                placeholder="Lyon, Paris, Marseille..."
                 className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
-              >
-                {LYON_METRO_CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
+              />
+              <datalist id="city-suggestions">
+                {LYON_METRO_CITIES.map((c) => <option key={c} value={c} />)}
+              </datalist>
             </label>
 
             <button

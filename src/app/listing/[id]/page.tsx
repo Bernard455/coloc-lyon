@@ -57,7 +57,7 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
 
           {listing.numberOfRooms === 3 && (
             <div className={`mb-4 rounded-xl2 p-4 text-sm ${listing.fourthRoomStatus === "COMPATIBLE" ? "badge-success" : "badge-warning"}`}>
-              {listing.fourthRoomStatus === "COMPATIBLE" ? "✅ Compatible 4 colocataires" : "❓ À vérifier auprès du propriétaire"}
+              {listing.fourthRoomStatus === "COMPATIBLE" ? `✅ Compatible ${listing.numberOfRooms + 1} colocataires` : "❓ À vérifier auprès du propriétaire"}
               {listing.fourthRoomNote && <p className="mt-1 font-normal">{listing.fourthRoomNote}</p>}
             </div>
           )}

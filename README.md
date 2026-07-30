@@ -143,6 +143,27 @@ jobs:
 
 La route elle-même vérifie la fréquence configurée avant de relancer quoi que ce soit — appeler `/api/cron/sync` plus souvent que nécessaire ne déclenche pas de synchronisations en trop.
 
+## Généralisation villes / taille de groupe
+
+Le site était initialement câblé sur "Lyon + groupe de 4" (brief de départ). Ça a été généralisé :
+
+- **Taille du groupe** (`groupSize`, 2 à 8) remplace le "4" auparavant fixe partout — prix par personne, nombre de chambres par défaut, libellés des badges ("Compatible {n} colocataires")
+- **Villes** : la liste des 7 communes lyonnaises reste affichée comme suggestions rapides (boutons "+ Ville"), mais n'importe quelle autre ville française peut être ajoutée librement (recherche, formulaire admin, alertes) — plus de liste fermée
+- **Budget** : plage des sliders élargie (jusqu'à 5000€ total / 1500€ par personne) pour couvrir d'autres villes que Lyon
+- **Ingestion** : ne filtre plus par ville à la source — le filtrage géographique se fait uniquement à la recherche, donc n'importe quelle ville présente dans les annonces ajoutées est utilisable
+
+Compatible avec l'existant : les alertes créées avant cette évolution (sans `groupSize` dans leurs critères) continuent de fonctionner avec un repli automatique sur 4.
+
+## Espace privé (groupes)
+
+Ajouté sans toucher aux favoris personnels existants : `Favorite` a maintenant un champ optionnel `groupId` — absent = favori strictement personnel (comportement historique inchangé), renseigné = partagé dans ce groupe et visible par tous ses membres.
+
+- **`/groupes`** — créer un groupe ou en rejoindre un via un code d'invitation
+- **`/groupes/[id]`** — membres, favoris partagés (avec qui les a ajoutés et sa note), retrait possible
+- Depuis **`/favoris`**, chaque favori personnel peut être partagé vers un groupe existant
+
+**Prérequis pour que ça fonctionne réellement** : nécessite une vraie connexion utilisateur. L'authentification Google (déjà configurée dans le code via Auth.js) doit être activée en créant de vrais identifiants OAuth sur Google Cloud Console et en les renseignant dans les variables d'environnement (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`) — voir la section Auth.js plus haut dans ce README.
+
 ## Ce qui vient d'être ajouté
 
 - **Géocodage automatique** (`src/lib/geocoding.ts`) : convertit une adresse en latitude/longitude via l'API Adresse du gouvernement français (gratuite, sans clé, précise pour la France) avec repli automatique sur Nominatim/OpenStreetMap. Le formulaire admin n'exige plus de saisir les coordonnées à la main — bouton "Localiser l'adresse" avec confirmation visuelle. L'import CSV (`adapters/manual.ts`) géocode aussi automatiquement les lignes sans coordonnées.

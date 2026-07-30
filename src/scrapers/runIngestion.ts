@@ -13,7 +13,6 @@
  */
 
 import { prisma } from "@/lib/db";
-import { LYON_METRO_CITIES } from "@/types/listing";
 import { manualAdapter } from "./adapters/manual";
 import { jinkaAdapter } from "./adapters/jinka.example";
 import { computeQualityScore, detectSuspicious } from "@/lib/scoring";
@@ -29,8 +28,10 @@ export interface IngestionSummary {
 }
 
 export async function runIngestion(): Promise<IngestionSummary> {
-  const cities = [...LYON_METRO_CITIES];
-  console.log(`[ingest] Démarrage — villes : ${cities.join(", ")}`);
+  // Tableau vide = pas de restriction géographique à l'ingestion ; le
+  // filtrage par ville se fait côté recherche (API /api/listings), pas ici.
+  const cities: string[] = [];
+  console.log(`[ingest] Démarrage — toutes villes (filtrage à la recherche)`);
 
   const summary: IngestionSummary = { perSource: [], duplicateClusters: 0, finishedAt: "" };
 

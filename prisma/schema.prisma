@@ -154,7 +154,33 @@ model User {
   comparisons   Comparison[]
   accounts      Account[]
   sessions      Session[]
+  groupsOwned   Group[]        @relation("GroupOwner")
+  groupMemberships GroupMember[]
   createdAt     DateTime   @default(now())
+}
+
+// Espace privé collaboratif — un petit groupe (ex: toi + tes colocataires)
+// qui partage des favoris annotés sur les mêmes annonces.
+model Group {
+  id          String        @id @default(cuid())
+  name        String
+  inviteCode  String        @unique @default(cuid())
+  ownerId     String
+  owner       User          @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     GroupMember[]
+  favorites   Favorite[]
+  createdAt   DateTime      @default(now())
+}
+
+model GroupMember {
+  id       String   @id @default(cuid())
+  groupId  String
+  group    Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt DateTime @default(now())
+
+  @@unique([groupId, userId])
 }
 
 // Modèles requis par l'adapter Prisma d'Auth.js (@auth/prisma-adapter)
@@ -199,9 +225,13 @@ model Favorite {
   listingId String
   listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
   note      String?
+  // Absent = favori strictement personnel. Renseigné = partagé dans ce groupe,
+  // visible par tous ses membres (voir /groupes/[id]).
+  groupId   String?
+  group     Group?   @relation(fields: [groupId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
-  @@unique([userId, listingId])
+  @@unique([userId, listingId, groupId])
 }
 
 model Comparison {

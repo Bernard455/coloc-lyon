@@ -24,7 +24,7 @@ function buildOrderBy(sort: SortOption): Prisma.ListingOrderByWithRelationInput[
   }
 }
 
-function toDTO(listing: any): ListingDTO {
+function toDTO(listing: any, groupSize: number): ListingDTO {
   const numberOfRooms = listing.numberOfRooms || 1;
   return {
     id: listing.id,
@@ -32,7 +32,7 @@ function toDTO(listing: any): ListingDTO {
     description: listing.description,
     propertyType: listing.propertyType,
     totalRentEuros: listing.totalRent / 100,
-    pricePerPersonEuros: Math.round(listing.totalRent / 100 / Math.max(numberOfRooms, 4)),
+    pricePerPersonEuros: Math.round(listing.totalRent / 100 / Math.max(groupSize, 1)),
     chargesIncluded: listing.chargesIncluded,
     surfaceM2: listing.surfaceM2,
     numberOfRooms,
@@ -76,9 +76,10 @@ export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
 
   const cities = (params.get("cities") || "").split(",").filter(Boolean);
+  const groupSize = Math.max(1, Number(params.get("groupSize") || 4));
   const maxTotalRentEuros = Number(params.get("maxTotalRentEuros") || 1600);
   const maxPricePerPersonEuros = Number(params.get("maxPricePerPersonEuros") || 400);
-  const numberOfRooms = (params.get("numberOfRooms") || "4,3").split(",").map(Number);
+  const numberOfRooms = (params.get("numberOfRooms") || String(groupSize)).split(",").map(Number);
   const propertyTypes = (params.get("propertyTypes") || "").split(",").filter(Boolean) as PropertyType[];
   const onlyFourCompatible = params.get("onlyFourCompatible") === "true";
   const sort = (params.get("sort") || "price_asc") as SortOption;
@@ -109,7 +110,7 @@ export async function GET(req: NextRequest) {
   ]);
 
   let listings = rawListings
-    .map(toDTO)
+    .map((l) => toDTO(l, groupSize))
     .filter((l) => l.pricePerPersonEuros <= maxPricePerPersonEuros);
 
   // Tri secondaire par priorité de type de logement (logements entiers > coloc > chambre),

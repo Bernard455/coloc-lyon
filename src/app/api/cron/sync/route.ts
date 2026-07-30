@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { runIngestion } from "@/scrapers/runIngestion";
 import { isSyncDue, minutesUntilDue, type SyncFrequency } from "@/lib/syncSchedule";
+
+// Cette route interroge/écrit en base à chaque appel (par le cron ou
+// manuellement) — jamais de rendu statique au moment du build, pour la
+// même raison que /dashboard et /sitemap.xml.
 export const dynamic = "force-dynamic";
 
 const SETTINGS_ID = "default";

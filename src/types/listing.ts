@@ -80,9 +80,10 @@ export type SortOption =
 
 export interface SearchFilters {
   cities: string[];
+  groupSize: number; // taille du groupe recherché (2 à 8) — remplace le "4" auparavant fixe
   maxTotalRentEuros: number;
   maxPricePerPersonEuros: number;
-  numberOfRooms: (3 | 4)[];
+  numberOfRooms: number[];
   propertyTypes: PropertyType[];
   onlyFourCompatible?: boolean;
   sort: SortOption;
@@ -91,6 +92,9 @@ export interface SearchFilters {
   query?: string; // recherche en langage naturel brute, avant parsing NLP
 }
 
+// Villes de départ suggérées (bassin lyonnais) — n'importe quelle autre
+// ville en France peut être ajoutée librement dans les filtres et le
+// formulaire admin, ce n'est plus une liste fermée.
 export const LYON_METRO_CITIES = [
   "Lyon",
   "Villeurbanne",
@@ -101,16 +105,28 @@ export const LYON_METRO_CITIES = [
   "Tassin-la-Demi-Lune"
 ] as const;
 
+export const MIN_GROUP_SIZE = 2;
+export const MAX_GROUP_SIZE = 8;
+
+function defaultRoomsForGroupSize(groupSize: number): number[] {
+  // Priorité : logements avec exactement la taille du groupe, puis un de
+  // moins (chambre en moins compensée par un salon convertible par ex).
+  return groupSize > MIN_GROUP_SIZE ? [groupSize, groupSize - 1] : [groupSize];
+}
+
 export const DEFAULT_FILTERS: SearchFilters = {
   cities: [...LYON_METRO_CITIES],
+  groupSize: 4,
   maxTotalRentEuros: 1600,
   maxPricePerPersonEuros: 400,
-  numberOfRooms: [4, 3],
+  numberOfRooms: defaultRoomsForGroupSize(4),
   propertyTypes: ["APARTMENT", "HOUSE", "EXISTING_ROOMMATE_SHARE"],
   sort: "price_asc",
   page: 1,
   pageSize: 24
 };
+
+export { defaultRoomsForGroupSize };
 
 // Ordre de priorité utilisé pour le tri secondaire (après le critère de tri choisi)
 export const PROPERTY_TYPE_PRIORITY: Record<PropertyType, number> = {
