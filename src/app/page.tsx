@@ -6,6 +6,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { Filters } from "@/components/Filters";
 import { ListingCard } from "@/components/ListingCard";
 import { AuthButton } from "@/components/AuthButton";
+import { Toast, type ToastState } from "@/components/Toast";
 import { parseSearchQuery, mergeIntentIntoFilters } from "@/lib/nlpSearch";
 import { DEFAULT_FILTERS, type ListingDTO, type SearchFilters } from "@/types/listing";
 
@@ -48,13 +49,19 @@ export default function HomePage() {
     setFilters((prev) => mergeIntentIntoFilters({ ...prev, query, page: 1 }, intent));
   };
 
+  const [toast, setToast] = useState<ToastState | null>(null);
+
   const toggleFavorite = (id: string) => {
+    const willBeFavorited = !favorites.has(id);
     setFavorites((prev) => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
     fetch("/api/favorites", { method: "POST", body: JSON.stringify({ listingId: id }) }).catch(() => {});
+    if (willBeFavorited) {
+      setToast({ message: "Ajouté aux favoris", href: "/favoris", linkLabel: "Voir mes favoris →" });
+    }
   };
 
   const resultsLabel = useMemo(() => {
@@ -135,6 +142,8 @@ export default function HomePage() {
           )}
         </section>
       </div>
+
+      <Toast toast={toast} onDismiss={() => setToast(null)} />
     </main>
   );
 }

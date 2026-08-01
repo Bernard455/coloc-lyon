@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ListingCard } from "@/components/ListingCard";
+import { Toast, type ToastState } from "@/components/Toast";
 import { listingToDTO } from "@/lib/listingDTO";
 import type { ListingDTO } from "@/types/listing";
 
@@ -15,7 +16,7 @@ export default function FavoritesPage() {
   const [loading, setLoading] = useState(true);
   const [groups, setGroups] = useState<GroupOption[]>([]);
   const [shareTarget, setShareTarget] = useState<Record<string, string>>({});
-  const [sharedMessage, setSharedMessage] = useState<string | null>(null);
+  const [toast, setToast] = useState<ToastState | null>(null);
 
   function loadFavorites() {
     fetch("/api/favorites")
@@ -34,9 +35,16 @@ export default function FavoritesPage() {
   async function shareToGroup(listingId: string) {
     const groupId = shareTarget[listingId];
     if (!groupId) return;
-    await fetch("/api/favorites", { method: "POST", body: JSON.stringify({ listingId, groupId }) });
-    setSharedMessage("Partagé dans le groupe ✅");
-    setTimeout(() => setSharedMessage(null), 2500);
+    const groupName = groups.find((g) => g.id === groupId)?.name ?? "le groupe";
+
+    const res = await fetch(`/api/groups/${groupId}/favorites`, { method: "POST", body: JSON.stringify({ listingId }) });
+    const data = await res.json();
+
+    setToast(
+      data.alreadyShared
+        ? { message: `Déjà partagé dans ${groupName}`, href: `/groupes/${groupId}`, linkLabel: "Voir le groupe →" }
+        : { message: `Partagé dans ${groupName}`, href: `/groupes/${groupId}`, linkLabel: "Voir le groupe →" }
+    );
   }
 
   return (
@@ -46,8 +54,6 @@ export default function FavoritesPage() {
         <h1 className="text-2xl font-bold">❤️ Mes logements favoris</h1>
         <a href="/groupes" className="btn-secondary text-sm">👥 Mes groupes</a>
       </div>
-
-      {sharedMessage && <p className="mb-4 text-sm text-emerald-600">{sharedMessage}</p>}
 
       {loading && <p className="text-gray-500">Chargement…</p>}
       {!loading && listings.length === 0 && (
@@ -84,6 +90,8 @@ export default function FavoritesPage() {
           </div>
         ))}
       </div>
+
+      <Toast toast={toast} onDismiss={() => setToast(null)} />
     </main>
   );
 }

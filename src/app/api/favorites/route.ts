@@ -5,15 +5,14 @@ import { getCurrentUserId } from "@/lib/auth-helpers";
 
 export const dynamic = "force-dynamic";
 
-const bodySchema = z.object({
-  listingId: z.string(),
-  note: z.string().optional(),
-  // Absent = favori personnel (comportement historique inchangé).
-  // Renseigné = partage ce favori dans le groupe donné (voir /groupes/[id]).
-  groupId: z.string().optional()
-});
+const bodySchema = z.object({ listingId: z.string(), note: z.string().optional() });
 
-/** GET /api/favorites — favoris strictement personnels (groupId absent), comme avant. */
+/**
+ * Favoris strictement personnels (groupId toujours null). Le partage vers
+ * un groupe est géré par une route dédiée : /api/groups/[id]/favorites —
+ * volontairement séparée pour ne pas mélanger deux logiques différentes
+ * ("mon toggle perso" vs "ressource partagée par le groupe entier").
+ */
 export async function GET() {
   const userId = await getCurrentUserId();
   if (!userId) return NextResponse.json({ favorites: [] });
@@ -30,23 +29,14 @@ export async function POST(req: NextRequest) {
   const userId = await getCurrentUserId();
   if (!userId) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
-  const { listingId, note, groupId } = bodySchema.parse(await req.json());
+  const { listingId, note } = bodySchema.parse(await req.json());
 
-  if (groupId) {
-    const membership = await prisma.groupMember.findUnique({
-      where: { groupId_userId: { groupId, userId } }
-    });
-    if (!membership) return NextResponse.json({ error: "Tu n'es pas membre de ce groupe" }, { status: 403 });
-  }
-
-  const existing = await prisma.favorite.findFirst({
-    where: { userId, listingId, groupId: groupId ?? null }
-  });
+  const existing = await prisma.favorite.findFirst({ where: { userId, listingId, groupId: null } });
   if (existing) {
     await prisma.favorite.delete({ where: { id: existing.id } });
     return NextResponse.json({ favorited: false });
   }
 
-  await prisma.favorite.create({ data: { userId, listingId, note, groupId } });
+  await prisma.favorite.create({ data: { userId, listingId, note } });
   return NextResponse.json({ favorited: true });
 }

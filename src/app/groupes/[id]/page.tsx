@@ -52,7 +52,7 @@ export default function GroupDetailPage({ params }: { params: { id: string } }) 
   }
 
   async function unshare(listingId: string) {
-    await fetch("/api/favorites", { method: "POST", body: JSON.stringify({ listingId, groupId: params.id }) });
+    await fetch(`/api/groups/${params.id}/favorites`, { method: "DELETE", body: JSON.stringify({ listingId }) });
     load();
   }
 
