@@ -65,4 +65,4 @@ le plan Hobby de Vercel.
 
 - Planifie `npm run ingest` en cron (Vercel Cron Jobs, gratuit sur le plan Hobby jusqu'à 2 jobs) pour rafraîchir les annonces automatiquement
 - Ajoute tes propres annonces via `/admin/ajouter-annonce` une fois le site en ligne
-- Un nom de domaine personnalisé (ex: `coloc-lyon.fr`) peut être branché gratuitement depuis les réglages du projet Vercel si tu en achètes un (OVH, Gandi…)
+- Un nom de domaine personnalisé (ex: `coloc-lyon.vercel.app`) peut être branché gratuitement depuis les réglages du projet Vercel si tu en achètes un (OVH, Gandi…)

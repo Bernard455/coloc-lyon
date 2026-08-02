@@ -154,6 +154,16 @@ Le site était initialement câblé sur "Lyon + groupe de 4" (brief de départ).
 
 Compatible avec l'existant : les alertes créées avant cette évolution (sans `groupSize` dans leurs critères) continuent de fonctionner avec un repli automatique sur 4.
 
+## Pages légales, aide et contact
+
+Ajoutées pour la conformité et la préparation à un vrai lancement public (mentionné dans le brief monétisation/publicité) :
+- `/mentions-legales`, `/confidentialite`, `/cgu` — contenus prêts, avec des champs `[À compléter]` clairement marqués là où seule toi peux renseigner l'info (nom, adresse)
+- `/aide` — FAQ sur le fonctionnement réel du site (groupes, badges, score, limites de l'automatisation)
+- `/contact` — formulaire fonctionnel, enregistre les messages en base (nouveau modèle `ContactMessage`) — pas encore d'envoi d'email réel tant qu'un provider (Resend) n'est pas configuré, mais rien n'est perdu : consultable via `npm run db:studio`
+- Pied de page ajouté sur tout le site avec ces liens
+- **Bug corrigé au passage** : le sitemap et robots.txt pointaient vers un domaine fictif (`coloc-lyon.fr`, jamais existant) au lieu du vrai `coloc-lyon.vercel.app` — sans doute jamais remarqué faute de trafic Google réel jusqu'ici
+- **Données structurées Schema.org** ajoutées sur les pages d'annonce (aide au référencement)
+
 ## Espace privé (groupes)
 
 Ajouté sans toucher aux favoris personnels existants : `Favorite` a maintenant un champ optionnel `groupId` — absent = favori strictement personnel (comportement historique inchangé), renseigné = partagé dans ce groupe et visible par tous ses membres.

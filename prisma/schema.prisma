@@ -285,3 +285,17 @@ model SyncSettings {
   lastRunStatus String?   // "success" | "failed" | "running"
   updatedAt     DateTime  @updatedAt
 }
+
+// Messages envoyés depuis la page /contact. Base pour une future boîte de
+// réception admin (marquer lu/non lu, archiver...).
+model ContactMessage {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String
+  subject   String // motif choisi : "question" | "signalement" | ...
+  message   String @db.Text
+  read      Boolean  @default(false)
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

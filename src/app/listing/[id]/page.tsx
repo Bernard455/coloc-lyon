@@ -28,7 +28,33 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
 
   const pricePerPerson = Math.round(listing.totalRent / 100 / Math.max(listing.numberOfRooms, 4));
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Residence",
+    name: listing.title,
+    description: listing.description,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: listing.address,
+      addressLocality: listing.city,
+      postalCode: listing.postalCode,
+      addressCountry: "FR"
+    },
+    geo: { "@type": "GeoCoordinates", latitude: listing.latitude, longitude: listing.longitude },
+    numberOfRooms: listing.numberOfRooms,
+    floorSize: listing.surfaceM2 ? { "@type": "QuantitativeValue", value: listing.surfaceM2, unitCode: "MTK" } : undefined,
+    image: listing.mainPhotoUrl,
+    offers: {
+      "@type": "Offer",
+      price: listing.totalRent / 100,
+      priceCurrency: "EUR",
+      availability: listing.status === "ACTIVE" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+    }
+  };
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     <main className="mx-auto max-w-5xl px-4 py-8">
       <a href="/" className="mb-4 inline-block text-sm text-brand-600 hover:underline">
         ← Retour aux résultats
@@ -112,5 +138,6 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
         </aside>
       </div>
     </main>
+    </>
   );
 }
