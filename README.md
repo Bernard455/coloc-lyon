@@ -154,6 +154,12 @@ Le site était initialement câblé sur "Lyon + groupe de 4" (brief de départ).
 
 Compatible avec l'existant : les alertes créées avant cette évolution (sans `groupSize` dans leurs critères) continuent de fonctionner avec un repli automatique sur 4.
 
+## Envoi d'email réel pour le formulaire de contact
+
+Ajouté sans dépendance supplémentaire : `src/lib/email.ts` appelle l'API Resend en HTTP direct. Si `RESEND_API_KEY` ou `CONTACT_NOTIFICATION_EMAIL` ne sont pas configurés, le site continue de fonctionner normalement (le message reste enregistré en base, juste pas d'email envoyé) — voir `.env.example`.
+
+Le `reply_to` de l'email envoyé est automatiquement l'adresse de la personne qui a écrit — tu peux répondre directement depuis ta messagerie habituelle.
+
 ## Pages légales, aide et contact
 
 Ajoutées pour la conformité et la préparation à un vrai lancement public (mentionné dans le brief monétisation/publicité) :
