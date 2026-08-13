@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LYON_METRO_CITIES } from "@/types/listing";
+import { AdminGuard } from "@/components/AdminGuard";
 
 const PROPERTY_TYPES = [
   { value: "APARTMENT", label: "Appartement entier" },
@@ -120,6 +121,7 @@ export default function AddListingPage() {
   }
 
   return (
+    <AdminGuard>
     <main className="mx-auto max-w-3xl px-4 py-8">
       <a href="/" className="mb-4 inline-block text-sm text-brand-600 hover:underline">← Retour à la recherche</a>
       <h1 className="mb-2 text-2xl font-bold">Ajouter une annonce</h1>
@@ -311,5 +313,6 @@ export default function AddListingPage() {
         </button>
       </form>
     </main>
+    </AdminGuard>
   );
 }

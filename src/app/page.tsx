@@ -87,6 +87,7 @@ export default function HomePage() {
               <a href="/dashboard" className="btn-secondary">📊 Tableau de bord</a>
               <a href="/admin/ajouter-annonce" className="btn-secondary">➕ Ajouter une annonce</a>
               <a href="/admin/synchronisation" className="btn-secondary">⚙️ Synchronisation</a>
+              <a href="/admin/messages" className="btn-secondary">📬 Messages</a>
             </nav>
             <AuthButton />
           </div>

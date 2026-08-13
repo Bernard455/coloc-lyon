@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { computeQualityScore, detectSuspicious } from "@/lib/scoring";
+import { isCurrentUserAdmin } from "@/lib/adminAuth";
+
+export const dynamic = "force-dynamic";
 
 const createListingSchema = z.object({
   title: z.string().min(3),
@@ -43,6 +46,9 @@ const createListingSchema = z.object({
  * partenariat API n'est signé — voir src/scrapers/README.md.
  */
 export async function POST(req: NextRequest) {
+  if (!(await isCurrentUserAdmin())) {
+    return NextResponse.json({ error: "Accès réservé aux administrateurs" }, { status: 403 });
+  }
   const data = createListingSchema.parse(await req.json());
 
   const comparable = await prisma.listing.findMany({

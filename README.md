@@ -154,6 +154,17 @@ Le site était initialement câblé sur "Lyon + groupe de 4" (brief de départ).
 
 Compatible avec l'existant : les alertes créées avant cette évolution (sans `groupSize` dans leurs critères) continuent de fonctionner avec un repli automatique sur 4.
 
+## Protection admin + boîte de réception
+
+**Faille corrigée** : aucune page `/admin/*` n'était protégée jusqu'ici — n'importe qui connecté (ou non) pouvait y accéder. Corrigé avec :
+- `src/lib/adminAuth.ts` — vérifie l'email connecté contre `ADMIN_EMAILS` (liste séparée par virgules dans `.env`)
+- `src/app/admin/layout.tsx` — bloque toutes les pages `/admin/*` d'un coup pour les non-admins
+- Chaque route API admin vérifie aussi côté serveur (`isCurrentUserAdmin()`), pas seulement l'affichage — un appel direct à l'API sans passer par la page est aussi bloqué
+
+**Nouveau** : `/admin/messages` — boîte de réception des messages du formulaire `/contact` (marquer lu/non lu, archiver).
+
+**Configuration requise** : ajouter ton email dans `ADMIN_EMAILS` (voir `.env.example`) — sans ça, personne (même toi) ne peut accéder aux pages admin après ce changement.
+
 ## Envoi d'email réel pour le formulaire de contact
 
 Ajouté sans dépendance supplémentaire : `src/lib/email.ts` appelle l'API Resend en HTTP direct. Si `RESEND_API_KEY` ou `CONTACT_NOTIFICATION_EMAIL` ne sont pas configurés, le site continue de fonctionner normalement (le message reste enregistré en base, juste pas d'email envoyé) — voir `.env.example`.

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { isCurrentUserAdmin } from "@/lib/adminAuth";
 
 // GET() ne prend aucun paramètre de requête — sans ceci, Next.js pourrait
 // tenter de le pré-rendre au moment du build (même souci que dashboard/
@@ -15,6 +16,9 @@ const updateSchema = z.object({
 });
 
 export async function GET() {
+  if (!(await isCurrentUserAdmin())) {
+    return NextResponse.json({ error: "Accès réservé aux administrateurs" }, { status: 403 });
+  }
   const settings = await prisma.syncSettings.upsert({
     where: { id: SETTINGS_ID },
     create: { id: SETTINGS_ID },
@@ -24,6 +28,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  if (!(await isCurrentUserAdmin())) {
+    return NextResponse.json({ error: "Accès réservé aux administrateurs" }, { status: 403 });
+  }
   const data = updateSchema.parse(await req.json());
   const settings = await prisma.syncSettings.upsert({
     where: { id: SETTINGS_ID },
