@@ -1,3 +1,4 @@
+import { getPopularityInfo } from "@/lib/popularity";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { PROPERTY_TYPE_PRIORITY, type ListingDTO, type PropertyType, type SortOption } from "@/types/listing";
@@ -68,7 +69,8 @@ function toDTO(listing: any, groupSize: number): ListingDTO {
     publishedAt: listing.externalPublishedAt ? listing.externalPublishedAt.toISOString() : null,
     qualityScore: listing.qualityScore,
     scoreBreakdown: listing.scoreBreakdown,
-    isSuspicious: listing.isSuspicious
+    isSuspicious: listing.isSuspicious,
+    popularity: getPopularityInfo(listing._count?.favorites ?? 0)
   };
 }
 
@@ -101,7 +103,10 @@ export async function GET(req: NextRequest) {
     prisma.listing.count({ where }),
     prisma.listing.findMany({
       where,
-      include: { photos: { orderBy: { position: "asc" } } },
+      include: {
+        photos: { orderBy: { position: "asc" } },
+        _count: { select: { favorites: true } }
+      },
       orderBy: buildOrderBy(sort),
       // On sur-fetch légèrement pour compenser le post-filtrage prix/personne, puis on pagine en mémoire
       take: pageSize * 3,

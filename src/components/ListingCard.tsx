@@ -28,6 +28,14 @@ export function ListingCard({ listing, onToggleFavorite, isFavorite, groupSize =
 
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
           <span className="badge bg-white/90 text-gray-800 backdrop-blur">{PROPERTY_TYPE_LABELS[listing.propertyType]}</span>
+          {listing.popularity && (
+            <span
+              className="badge bg-white/90 text-gray-800 backdrop-blur"
+              title={listing.popularity.label}
+            >
+              {listing.popularity.emoji} {listing.popularity.label}
+            </span>
+          )}
           {listing.fourthRoomStatus === "COMPATIBLE" && <span className="badge badge-success">✅ Compatible {groupSize} colocataires</span>}
           {listing.fourthRoomStatus === "UNKNOWN" && listing.numberOfRooms === groupSize - 1 && (
             <span className="badge badge-warning">❓ À vérifier auprès du propriétaire</span>

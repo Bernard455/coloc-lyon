@@ -1,3 +1,4 @@
+import { getPopularityInfo } from "@/lib/popularity";
 import type { ListingDTO } from "@/types/listing";
 
 /**
@@ -51,6 +52,7 @@ export function listingToDTO(l: any): ListingDTO {
     publishedAt: l.externalPublishedAt ?? null,
     qualityScore: l.qualityScore,
     scoreBreakdown: l.scoreBreakdown,
-    isSuspicious: l.isSuspicious
+    isSuspicious: l.isSuspicious,
+    popularity: getPopularityInfo(l._count?.favorites ?? l.favoritesCount ?? 0)
   };
 }
