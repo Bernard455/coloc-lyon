@@ -1,3 +1,4 @@
+import { getPopularityInfo } from "@/lib/popularity";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
@@ -7,7 +8,10 @@ import type { Metadata } from "next";
 async function getListing(id: string) {
   const listing = await prisma.listing.findUnique({
     where: { id },
-    include: { photos: { orderBy: { position: "asc" } } }
+    include: {
+      photos: { orderBy: { position: "asc" } },
+      _count: { select: { favorites: true } }
+    }
   });
   return listing;
 }
@@ -27,6 +31,7 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
   if (!listing) notFound();
 
   const pricePerPerson = Math.round(listing.totalRent / 100 / Math.max(listing.numberOfRooms, 4));
+  const popularity = getPopularityInfo(listing._count?.favorites ?? 0);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -72,9 +77,16 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
         <div>
           <div className="mb-2 flex items-start justify-between gap-4">
             <h1 className="text-2xl font-bold">{listing.title}</h1>
-            {listing.qualityScore !== null && (
-              <ScoreBadge score={listing.qualityScore} breakdown={listing.scoreBreakdown as any} />
-            )}
+            <div className="flex flex-col items-end gap-1.5">
+              {popularity && (
+                <span className="badge bg-white/90 text-gray-800" title={popularity.label}>
+                  {popularity.emoji} {popularity.label}
+                </span>
+              )}
+              {listing.qualityScore !== null && (
+                <ScoreBadge score={listing.qualityScore} breakdown={listing.scoreBreakdown as any} />
+              )}
+            </div>
           </div>
           <p className="mb-4 text-gray-500 dark:text-gray-400">
             {listing.neighborhood ? `${listing.neighborhood}, ` : ""}

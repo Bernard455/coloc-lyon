@@ -4,7 +4,10 @@ import { prisma } from "@/lib/db";
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   const listing = await prisma.listing.findUnique({
     where: { id: params.id },
-    include: { photos: { orderBy: { position: "asc" } } }
+    include: {
+      photos: { orderBy: { position: "asc" } },
+      _count: { select: { favorites: true } }
+    }
   });
 
   if (!listing) {
