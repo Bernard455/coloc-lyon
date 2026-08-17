@@ -299,3 +299,14 @@ model ContactMessage {
   archived  Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+// Coordonnées légales du site, éditables depuis /admin/contenu.
+// Ligne unique (id fixe "default"), même pattern que SyncSettings.
+model SiteContent {
+  id           String   @id @default("default")
+  ownerName    String   @default("")
+  ownerAddress String   @default("")
+  ownerEmail   String   @default("")
+  ownerPhone   String   @default("")
+  updatedAt    DateTime @updatedAt
+}
