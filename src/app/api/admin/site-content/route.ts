@@ -12,7 +12,13 @@ export async function GET() {
 
   const content = await prisma.siteContent.findUnique({ where: { id: "default" } });
   return NextResponse.json({
-    content: content ?? { ownerName: "", ownerAddress: "", ownerEmail: "", ownerPhone: "" }
+    content: content ?? {
+      ownerName: "",
+      ownerAddress: "",
+      ownerEmail: "",
+      ownerPhone: "",
+      tagline: "Compare et partage les logements trouvés pour ton groupe"
+    }
   });
 }
 
@@ -23,12 +29,12 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { ownerName, ownerAddress, ownerEmail, ownerPhone } = body;
+  const { ownerName, ownerAddress, ownerEmail, ownerPhone, tagline } = body;
 
   const content = await prisma.siteContent.upsert({
     where: { id: "default" },
-    update: { ownerName, ownerAddress, ownerEmail, ownerPhone },
-    create: { id: "default", ownerName, ownerAddress, ownerEmail, ownerPhone }
+    update: { ownerName, ownerAddress, ownerEmail, ownerPhone, tagline },
+    create: { id: "default", ownerName, ownerAddress, ownerEmail, ownerPhone, tagline }
   });
 
   return NextResponse.json({ content });

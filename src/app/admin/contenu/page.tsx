@@ -7,6 +7,7 @@ interface SiteContentData {
   ownerAddress: string;
   ownerEmail: string;
   ownerPhone: string;
+  tagline: string;
 }
 
 export default function AdminContenuPage() {
@@ -53,7 +54,15 @@ export default function AdminContenuPage() {
         Ces informations remplacent automatiquement les mentions <code className="rounded bg-gray-100 px-1 dark:bg-gray-800">[À compléter]</code> sur la page /mentions-legales.
       </p>
 
-      <form onSubmit={handleSubmit} className="card space-y-4 p-5">
+            <form onSubmit={handleSubmit} className="card space-y-4 p-5">
+        <label className="block text-sm font-medium">
+          Tagline affichée sur la page d'accueil
+          <input
+            value={content.tagline}
+            onChange={(e) => setContent({ ...content, tagline: e.target.value })}
+            className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+          />
+        </label>
         <label className="block text-sm font-medium">
           Nom / raison sociale
           <input

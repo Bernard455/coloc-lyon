@@ -308,5 +308,6 @@ model SiteContent {
   ownerAddress String   @default("")
   ownerEmail   String   @default("")
   ownerPhone   String   @default("")
+  tagline      String   @default("Compare et partage les logements trouvés pour ton groupe")
   updatedAt    DateTime @updatedAt
 }

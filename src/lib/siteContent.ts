@@ -1,22 +1,25 @@
-import { prisma } from "@/lib/db";
+import { prisma }import { prisma } from "@/lib/db";
 
 export interface SiteContentData {
   ownerName: string;
   ownerAddress: string;
   ownerEmail: string;
   ownerPhone: string;
+  tagline: string;
 }
 
 const DEFAULTS: SiteContentData = {
   ownerName: "",
   ownerAddress: "",
   ownerEmail: "",
-  ownerPhone: ""
+  ownerPhone: "",
+  tagline: "Compare et partage les logements trouvés pour ton groupe"
 };
 
 /**
- * Lit les coordonnées légales éditables depuis /admin/contenu.
- * Retourne des chaînes vides tant qu'elles n'ont jamais été renseignées.
+ * Lit le contenu éditable depuis /admin/contenu (coordonnées légales,
+ * tagline d'accueil...). Retourne des valeurs par défaut sûres tant que
+ * rien n'a encore été enregistré en base.
  */
 export async function getSiteContent(): Promise<SiteContentData> {
   const row = await prisma.siteContent.findUnique({ where: { id: "default" } });
@@ -25,6 +28,7 @@ export async function getSiteContent(): Promise<SiteContentData> {
     ownerName: row.ownerName,
     ownerAddress: row.ownerAddress,
     ownerEmail: row.ownerEmail,
-    ownerPhone: row.ownerPhone
+    ownerPhone: row.ownerPhone,
+    tagline: row.tagline
   };
 }

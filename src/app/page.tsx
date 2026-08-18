@@ -19,7 +19,7 @@ export default function HomePage() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"list" | "map">("list");
-  const [stats, setStats] = useState<{ total: number } | null>(null);
+  const [tagline, setTagline] = useState("Compare et partage les logements trouvés pour ton groupe");
 
   useEffect(() => {
     setLoading(true);
@@ -43,6 +43,15 @@ export default function HomePage() {
       })
       .finally(() => setLoading(false));
   }, [filters]);
+
+   useEffect(() => {
+    fetch("/api/site-content")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.content?.tagline) setTagline(data.content.tagline);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleNaturalSearch = (query: string) => {
     const intent = parseSearchQuery(query);
@@ -76,7 +85,7 @@ export default function HomePage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">Comparo</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Compare et partage les logements trouvés pour ton groupe</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{tagline}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <nav className="flex flex-wrap gap-3 text-sm font-medium">
