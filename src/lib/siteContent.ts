@@ -1,4 +1,4 @@
-import { prisma }import { prisma } from "@/lib/db";
+import { prisma } from "@/lib/db";
 
 export interface SiteContentData {
   ownerName: string;
