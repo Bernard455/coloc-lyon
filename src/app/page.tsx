@@ -19,6 +19,7 @@ export default function HomePage() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"list" | "map">("list");
+  const [stats, setStats] = useState<{ total: number } | null>(null);
   const [tagline, setTagline] = useState("Compare et partage les logements trouvés pour ton groupe");
 
   useEffect(() => {
