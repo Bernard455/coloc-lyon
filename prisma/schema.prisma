@@ -310,5 +310,6 @@ model SiteContent {
   ownerPhone   String   @default("")
   tagline      String   @default("Compare et partage les logements trouvés pour ton groupe")
   brandName    String   @default("Comparo")
+  faqItems     Json     @default("[]")
   updatedAt    DateTime @updatedAt
 }
