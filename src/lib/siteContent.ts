@@ -1,34 +1,42 @@
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { isCurrentUserAdmin } from "@/lib/adminAuth";
 
-export interface SiteContentData {
-  ownerName: string;
-  ownerAddress: string;
-  ownerEmail: string;
-  ownerPhone: string;
-  tagline: string;
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  const isAdmin = await isCurrentUserAdmin();
+  if (!isAdmin) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+  }
+
+  const content = await prisma.siteContent.findUnique({ where: { id: "default" } });
+  return NextResponse.json({
+    content: content ?? {
+      ownerName: "",
+      ownerAddress: "",
+      ownerEmail: "",
+      ownerPhone: "",
+      tagline: "Compare et partage les logements trouvés pour ton groupe",
+      brandName: "Comparo"
+    }
+  });
 }
 
-const DEFAULTS: SiteContentData = {
-  ownerName: "",
-  ownerAddress: "",
-  ownerEmail: "",
-  ownerPhone: "",
-  tagline: "Compare et partage les logements trouvés pour ton groupe"
-};
+export async function POST(req: NextRequest) {
+  const isAdmin = await isCurrentUserAdmin();
+  if (!isAdmin) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+  }
 
-/**
- * Lit le contenu éditable depuis /admin/contenu (coordonnées légales,
- * tagline d'accueil...). Retourne des valeurs par défaut sûres tant que
- * rien n'a encore été enregistré en base.
- */
-export async function getSiteContent(): Promise<SiteContentData> {
-  const row = await prisma.siteContent.findUnique({ where: { id: "default" } });
-  if (!row) return DEFAULTS;
-  return {
-    ownerName: row.ownerName,
-    ownerAddress: row.ownerAddress,
-    ownerEmail: row.ownerEmail,
-    ownerPhone: row.ownerPhone,
-    tagline: row.tagline
-  };
+  const body = await req.json();
+  const { ownerName, ownerAddress, ownerEmail, ownerPhone, tagline, brandName } = body;
+
+  const content = await prisma.siteContent.upsert({
+    where: { id: "default" },
+    update: { ownerName, ownerAddress, ownerEmail, ownerPhone, tagline, brandName },
+    create: { id: "default", ownerName, ownerAddress, ownerEmail, ownerPhone, tagline, brandName }
+  });
+
+  return NextResponse.json({ content });
 }
