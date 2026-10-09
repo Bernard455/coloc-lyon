@@ -22,12 +22,12 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { ownerName, ownerAddress, ownerEmail, ownerPhone, tagline, brandName, faqItems } = body;
+  const { ownerName, ownerAddress, ownerEmail, ownerPhone, tagline, brandName, faqItems, legalUpdatedAt } = body;
 
   const content = await prisma.siteContent.upsert({
     where: { id: "default" },
-    update: { ownerName, ownerAddress, ownerEmail, ownerPhone, tagline, brandName, faqItems },
-    create: { id: "default", ownerName, ownerAddress, ownerEmail, ownerPhone, tagline, brandName, faqItems }
+    update: { ownerName, ownerAddress, ownerEmail, ownerPhone, tagline, brandName, faqItems, legalUpdatedAt },
+    create: { id: "default", ownerName, ownerAddress, ownerEmail, ownerPhone, tagline, brandName, faqItems, legalUpdatedAt }
   });
 
   return NextResponse.json({ content });

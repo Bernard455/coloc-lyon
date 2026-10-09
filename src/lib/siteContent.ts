@@ -13,6 +13,7 @@ export interface SiteContentData {
   tagline: string;
   brandName: string;
   faqItems: FaqItem[];
+  legalUpdatedAt: string;
 }
 
 // Contenu historique codé en dur, repris comme valeur par défaut tant que
@@ -51,14 +52,16 @@ const DEFAULTS: SiteContentData = {
   ownerPhone: "",
   tagline: "Compare et partage les logements trouvés pour ton groupe",
   brandName: "Comparo",
-  faqItems: DEFAULT_FAQ
+  faqItems: DEFAULT_FAQ,
+  legalUpdatedAt: ""
 };
 
 /**
  * Lit le contenu éditable depuis /admin/contenu (coordonnées légales,
- * tagline d'accueil, nom de marque, FAQ...). Retourne des valeurs par
- * défaut sûres tant que rien n'a encore été enregistré en base — la FAQ
- * par défaut reprend le contenu historique codé en dur.
+ * tagline d'accueil, nom de marque, FAQ, date de mise à jour légale...).
+ * Retourne des valeurs par défaut sûres tant que rien n'a encore été
+ * enregistré en base — la FAQ par défaut reprend le contenu historique
+ * codé en dur.
  */
 export async function getSiteContent(): Promise<SiteContentData> {
   const row = await prisma.siteContent.findUnique({ where: { id: "default" } });
@@ -74,6 +77,18 @@ export async function getSiteContent(): Promise<SiteContentData> {
     ownerPhone: row.ownerPhone,
     tagline: row.tagline,
     brandName: row.brandName,
-    faqItems
+    faqItems,
+    legalUpdatedAt: row.legalUpdatedAt
   };
+}
+
+/**
+ * Formate la date de mise à jour légale en français ("6 octobre 2026"),
+ * ou renvoie le placeholder historique tant qu'elle n'a pas été renseignée.
+ */
+export function formatLegalUpdatedAt(legalUpdatedAt: string): string {
+  if (!legalUpdatedAt) return "[À compléter — date de mise en production réelle]";
+  const date = new Date(legalUpdatedAt);
+  if (Number.isNaN(date.getTime())) return "[À compléter — date de mise en production réelle]";
+  return date.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 }

@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import { LegalLayout } from "@/components/LegalLayout";
+import { getSiteContent, formatLegalUpdatedAt } from "@/lib/siteContent";
 
 export const metadata: Metadata = { title: "Politique de confidentialité" };
 
-export default function ConfidentialitePage() {
+export const dynamic = "force-dynamic";
+
+export default async function ConfidentialitePage() {
+  const { legalUpdatedAt } = await getSiteContent();
+
   return (
     <LegalLayout title="Politique de confidentialité">
-      <p>Dernière mise à jour : [À compléter — date de mise en production réelle].</p>
+      <p>Dernière mise à jour : {formatLegalUpdatedAt(legalUpdatedAt)}.</p>
 
       <h2>Données collectées</h2>
       <p>Lorsque tu te connectes avec Google, nous recevons et conservons :</p>

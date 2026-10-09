@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
 import { LegalLayout } from "@/components/LegalLayout";
+import { getSiteContent, formatLegalUpdatedAt } from "@/lib/siteContent";
 
 export const metadata: Metadata = { title: "Conditions générales d'utilisation" };
 
-export default function CGUPage() {
+export const dynamic = "force-dynamic";
+
+export default async function CGUPage() {
+  const { legalUpdatedAt } = await getSiteContent();
+
   return (
     <LegalLayout title="Conditions générales d'utilisation">
+      <p>Dernière mise à jour : {formatLegalUpdatedAt(legalUpdatedAt)}.</p>
+
       <h2>Objet</h2>
       <p>
         Ce site permet à ses utilisateurs de centraliser, comparer et partager des logements qu'ils ont trouvés sur

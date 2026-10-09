@@ -303,13 +303,14 @@ model ContactMessage {
 // Coordonnées légales du site, éditables depuis /admin/contenu.
 // Ligne unique (id fixe "default"), même pattern que SyncSettings.
 model SiteContent {
-  id           String   @id @default("default")
-  ownerName    String   @default("")
-  ownerAddress String   @default("")
-  ownerEmail   String   @default("")
-  ownerPhone   String   @default("")
-  tagline      String   @default("Compare et partage les logements trouvés pour ton groupe")
-  brandName    String   @default("Comparo")
-  faqItems     Json     @default("[]")
-  updatedAt    DateTime @updatedAt
+  id             String   @id @default("default")
+  ownerName      String   @default("")
+  ownerAddress   String   @default("")
+  ownerEmail     String   @default("")
+  ownerPhone     String   @default("")
+  tagline        String   @default("Compare et partage les logements trouvés pour ton groupe")
+  brandName      String   @default("Comparo")
+  faqItems       Json     @default("[]")
+  legalUpdatedAt String   @default("") // format YYYY-MM-DD, affichée sur Confidentialité et CGU
+  updatedAt      DateTime @updatedAt
 }

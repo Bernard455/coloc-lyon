@@ -15,6 +15,7 @@ interface SiteContentData {
   tagline: string;
   brandName: string;
   faqItems: FaqItem[];
+  legalUpdatedAt: string;
 }
 
 export default function AdminContenuPage() {
@@ -168,17 +169,23 @@ export default function AdminContenuPage() {
                   <button type="button" onClick={() => removeFaqItem(index)} className="rounded px-2 py-1 text-sm text-red-600" title="Supprimer">🗑</button>
                 </div>
               </div>
-              <label className="block text-sm font-medium">
-                Réponse
-                <textarea
-                  value={item.a}
-                  onChange={(e) => updateFaqItem(index, "a", e.target.value)}
-                  rows={3}
-                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
-                />
-              </label>
-            </div>
-          ))}
+                        <label className="block text-sm font-medium">
+            Téléphone (optionnel)
+            <input
+              value={content.ownerPhone}
+              onChange={(e) => setContent({ ...content, ownerPhone: e.target.value })}
+              className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+            />
+          </label>
+          <label className="block text-sm font-medium">
+            Date de dernière mise à jour légale (Confidentialité &amp; CGU)
+            <input
+              type="date"
+              value={content.legalUpdatedAt}
+              onChange={(e) => setContent({ ...content, legalUpdatedAt: e.target.value })}
+              className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+            />
+          </label>
         </div>
 
         <button type="submit" disabled={saving} className="btn-primary w-full disabled:opacity-60">
