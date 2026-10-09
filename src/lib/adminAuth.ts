@@ -1,22 +1,39 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
+import { prisma } from "@/lib/db";
+import { isAdminRole, isEmailInAdminList, isStaffRole, parseRole, type AppRole } from "@/lib/roles";
 
 /**
- * Vérifie si l'utilisateur connecté est administrateur, via une liste
- * d'emails autorisés (ADMIN_EMAILS, séparés par des virgules dans .env).
- * Suffisant pour un propriétaire unique ; si plusieurs niveaux de
- * permissions sont nécessaires plus tard (modérateur, etc.), remplacer
- * par un champ `role` sur le modèle User plutôt que cette liste statique.
+ * Rôle de l'utilisateur connecté. Les emails listés dans ADMIN_EMAILS
+ * (variable d'environnement) sont toujours ADMIN : filet de sécurité qui
+ * garantit au propriétaire de ne jamais se retrouver bloqué, même en cas
+ * d'erreur dans la table des rôles. Pour les autres, le rôle vient du
+ * champ `role` du modèle User.
  */
+export async function getCurrentRole(): Promise<AppRole> {
+  try {
+    const session = await getServerSession(authOptions);
+    const email = session?.user?.email;
+    if (!email) return "USER";
+
+    if (isEmailInAdminList(email, process.env.ADMIN_EMAILS)) return "ADMIN";
+
+    const userId = (session?.user as { id?: string } | undefined)?.id;
+    if (!userId) return "USER";
+
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+    return parseRole(user?.role) ?? "USER";
+  } catch {
+    return "USER";
+  }
+}
+
+/** Accès complet (contenu du site, synchronisation, gestion des rôles). */
 export async function isCurrentUserAdmin(): Promise<boolean> {
-  const session = await getServerSession(authOptions);
-  const email = session?.user?.email;
-  if (!email) return false;
+  return isAdminRole(await getCurrentRole());
+}
 
-  const admins = (process.env.ADMIN_EMAILS || "")
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-
-  return admins.includes(email.toLowerCase());
+/** Accès équipe : admin ou modérateur (messages, ajout d'annonces). */
+export async function isCurrentUserStaff(): Promise<boolean> {
+  return isStaffRole(await getCurrentRole());
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { isCurrentUserAdmin } from "@/lib/adminAuth";
+import { isCurrentUserStaff } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +11,7 @@ const patchSchema = z.object({
 });
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  if (!(await isCurrentUserAdmin())) {
+  if (!(await isCurrentUserStaff())) {
     return NextResponse.json({ error: "Accès réservé aux administrateurs" }, { status: 403 });
   }
 

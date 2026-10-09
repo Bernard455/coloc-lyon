@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
-import { isCurrentUserAdmin } from "@/lib/admin-guard";
+import { getCurrentRole } from "@/lib/adminAuth";
+import { isAdminRole, isStaffRole } from "@/lib/roles";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json({ isAdmin: await isCurrentUserAdmin() });
+  const role = await getCurrentRole();
+  return NextResponse.json({ role, isAdmin: isAdminRole(role), isStaff: isStaffRole(role) });
 }
