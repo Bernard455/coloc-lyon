@@ -16,6 +16,12 @@ const SOURCES = [
   "LEBONCOIN", "SELOGER", "BIENICI", "PAP", "STUDAPART", "CARTE_DES_COLOCS",
   "LOCSERVICE", "JINKA", "LOGIC_IMMO", "AGENCY", "STUDENT_RESIDENCE", "OTHER"
 ];
+// "" = inconnu (non envoyé), "yes" = oui, "no" = non
+function triState(value: FormDataEntryValue | null): boolean | undefined {
+  if (value === "yes") return true;
+  if (value === "no") return false;
+  return undefined;
+}
 
 /**
  * Formulaire d'ajout manuel d'une annonce vue sur une plateforme tierce.
@@ -90,6 +96,10 @@ export default function AddListingPage() {
       numberOfBathrooms: form.get("numberOfBathrooms") ? Number(form.get("numberOfBathrooms")) : undefined,
       furnished: form.get("furnished") === "on",
       dpeRating: String(form.get("dpeRating") || "") || undefined,
+      hasBalcony: triState(form.get("hasBalcony")),
+      hasParking: triState(form.get("hasParking")),
+      petsAllowed: triState(form.get("petsAllowed")),
+      hasElevator: triState(form.get("hasElevator")),
       fourthRoomStatus: String(form.get("fourthRoomStatus") || "UNKNOWN"),
       fourthRoomNote: String(form.get("fourthRoomNote") || "") || undefined,
       address,
@@ -191,6 +201,32 @@ export default function AddListingPage() {
               {["A", "B", "C", "D", "E", "F", "G"].map((l) => <option key={l} value={l}>{l}</option>)}
             </select>
           </label>
+          <label className="text-sm font-medium">
+            DPE
+            <select name="dpeRating" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 dark:border-gray-700 dark:bg-gray-900">
+              <option value="">—</option>
+              {["A", "B", "C", "D", "E", "F", "G"].map((l) => <option key={l} value={l}>{l}</option>)}
+            </select>
+          </label>
+
+          {[
+            { name: "hasBalcony", label: "Balcon / terrasse" },
+            { name: "hasParking", label: "Parking / garage" },
+            { name: "petsAllowed", label: "Animaux acceptés" },
+            { name: "hasElevator", label: "Ascenseur" }
+          ].map((field) => (
+            <label key={field.name} className="text-sm font-medium">
+              {field.label}
+              <select name={field.name} defaultValue="" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 dark:border-gray-700 dark:bg-gray-900">
+                <option value="">— Inconnu</option>
+                <option value="yes">Oui</option>
+                <option value="no">Non</option>
+              </select>
+            </label>
+          ))}
+
+          <label className="text-sm font-medium">
+            Compatibilité avec un colocataire supplémentaire
 
           <label className="text-sm font-medium">
             Compatibilité avec un colocataire supplémentaire

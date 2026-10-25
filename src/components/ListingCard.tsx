@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ScoreBadge } from "./ScoreBadge";
 import type { ListingDTO } from "@/types/listing";
+import { getPresentAmenities } from "@/lib/amenities";
 
 const PROPERTY_TYPE_LABELS: Record<ListingDTO["propertyType"], string> = {
   APARTMENT: "Appartement entier",
@@ -77,6 +78,9 @@ export function ListingCard({ listing, onToggleFavorite, isFavorite, groupSize =
           {listing.numberOfBathrooms && <span>🚿 {listing.numberOfBathrooms} SdB</span>}
           {listing.dpeRating && <span>⚡ DPE {listing.dpeRating}</span>}
           {listing.distanceMetroM !== null && listing.distanceMetroM !== undefined && <span>🚇 {listing.distanceMetroM} m</span>}
+          {getPresentAmenities(listing.amenities).map((a) => (
+            <span key={a.key}>{a.icon} {a.label}</span>
+          ))}
         </div>
       </Link>
     </div>

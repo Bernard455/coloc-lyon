@@ -73,6 +73,12 @@ model Listing {
   furnished          Boolean?
   dpeRating          String?           // A-G
 
+  // Équipements : null = information non renseignée
+  hasBalcony         Boolean?
+  hasParking         Boolean?
+  petsAllowed        Boolean?
+  hasElevator        Boolean?
+
   // 4e colocataire (pertinent surtout pour les T3)
   fourthRoomStatus   FourthRoomStatus  @default(UNKNOWN)
   fourthRoomNote     String?           @db.Text

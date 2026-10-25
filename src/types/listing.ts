@@ -1,4 +1,5 @@
 import type { PopularityInfo } from "@/lib/popularity";
+import type { AmenityFlags } from "@/lib/amenities";
 export type PropertyType = "APARTMENT" | "HOUSE" | "EXISTING_ROOMMATE_SHARE" | "SINGLE_ROOM";
 export type FourthRoomStatus = "UNKNOWN" | "COMPATIBLE" | "NOT_COMPATIBLE";
 export type SourcePlatform =
@@ -59,6 +60,7 @@ export interface ListingDTO {
   scoreBreakdown: ScoreBreakdown | null;
   isSuspicious: boolean;
   popularity: PopularityInfo | null;
+  amenities: AmenityFlags;
 }
 
 export interface ScoreBreakdown {

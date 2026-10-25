@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import type { Metadata } from "next";
+import { AMENITIES, amenityFlagsFromListing } from "@/lib/amenities";
 
 async function getListing(id: string) {
   const listing = await prisma.listing.findUnique({
@@ -32,6 +33,7 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
 
   const pricePerPerson = Math.round(listing.totalRent / 100 / Math.max(listing.numberOfRooms, 4));
   const popularity = getPopularityInfo(listing._count?.favorites ?? 0);
+  const amenityFlags = amenityFlagsFromListing(listing);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -108,6 +110,19 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
             <div><p className="text-gray-400">Meublé</p><p className="font-medium">{listing.furnished ? "Oui" : "Non"}</p></div>
             <div><p className="text-gray-400">DPE</p><p className="font-medium">{listing.dpeRating ?? "—"}</p></div>
           </div>
+
+          <h2 className="mb-2 font-semibold">Équipements</h2>
+          <ul className="mb-6 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+            {AMENITIES.map((a) => {
+              const value = amenityFlags[a.key];
+              return (
+                <li key={a.key} className={value === true ? "" : "text-gray-400"}>
+                  {value === true ? "✅" : value === false ? "❌" : "❔"} {a.icon} {a.label}
+                  {value === null && " (non renseigné)"}
+                </li>
+              );
+            })}
+          </ul>
 
           <h2 className="mb-2 font-semibold">Description</h2>
           <p className="mb-6 whitespace-pre-line text-sm leading-relaxed text-gray-700 dark:text-gray-300">{listing.description}</p>

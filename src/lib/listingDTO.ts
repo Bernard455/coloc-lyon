@@ -1,5 +1,6 @@
 import { getPopularityInfo } from "@/lib/popularity";
 import type { ListingDTO } from "@/types/listing";
+import { amenityFlagsFromListing } from "@/lib/amenities";
 
 /**
  * Convertit un enregistrement Listing brut (tel que renvoyé par Prisma via
@@ -53,6 +54,7 @@ export function listingToDTO(l: any): ListingDTO {
     qualityScore: l.qualityScore,
     scoreBreakdown: l.scoreBreakdown,
     isSuspicious: l.isSuspicious,
-    popularity: getPopularityInfo(l._count?.favorites ?? l.favoritesCount ?? 0)
+    popularity: getPopularityInfo(l._count?.favorites ?? l.favoritesCount ?? 0),
+    amenities: amenityFlagsFromListing(l)
   };
 }

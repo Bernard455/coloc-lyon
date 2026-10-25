@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { PROPERTY_TYPE_PRIORITY, type ListingDTO, type PropertyType, type SortOption } from "@/types/listing";
 import type { Prisma } from "@prisma/client";
+import { amenityFlagsFromListing } from "@/lib/amenities";
 
 function buildOrderBy(sort: SortOption): Prisma.ListingOrderByWithRelationInput[] {
   switch (sort) {
@@ -70,7 +71,8 @@ function toDTO(listing: any, groupSize: number): ListingDTO {
     qualityScore: listing.qualityScore,
     scoreBreakdown: listing.scoreBreakdown,
     isSuspicious: listing.isSuspicious,
-    popularity: getPopularityInfo(listing._count?.favorites ?? 0)
+    popularity: getPopularityInfo(listing._count?.favorites ?? 0),
+    amenities: amenityFlagsFromListing(listing)
   };
 }
 
