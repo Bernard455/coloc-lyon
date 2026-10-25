@@ -16,6 +16,7 @@ const SOURCES = [
   "LEBONCOIN", "SELOGER", "BIENICI", "PAP", "STUDAPART", "CARTE_DES_COLOCS",
   "LOCSERVICE", "JINKA", "LOGIC_IMMO", "AGENCY", "STUDENT_RESIDENCE", "OTHER"
 ];
+
 // "" = inconnu (non envoyé), "yes" = oui, "no" = non
 function triState(value: FormDataEntryValue | null): boolean | undefined {
   if (value === "yes") return true;
@@ -201,13 +202,6 @@ export default function AddListingPage() {
               {["A", "B", "C", "D", "E", "F", "G"].map((l) => <option key={l} value={l}>{l}</option>)}
             </select>
           </label>
-          <label className="text-sm font-medium">
-            DPE
-            <select name="dpeRating" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 dark:border-gray-700 dark:bg-gray-900">
-              <option value="">—</option>
-              {["A", "B", "C", "D", "E", "F", "G"].map((l) => <option key={l} value={l}>{l}</option>)}
-            </select>
-          </label>
 
           {[
             { name: "hasBalcony", label: "Balcon / terrasse" },
@@ -224,9 +218,6 @@ export default function AddListingPage() {
               </select>
             </label>
           ))}
-
-          <label className="text-sm font-medium">
-            Compatibilité avec un colocataire supplémentaire
 
           <label className="text-sm font-medium">
             Compatibilité avec un colocataire supplémentaire
